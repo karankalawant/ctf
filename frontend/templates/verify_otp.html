@@ -1,0 +1,69 @@
+{{define "content"}}
+<main class="flex min-h-screen w-full items-center justify-center bg-bg-dark">
+  <div class="w-full max-w-md px-8">
+    <div class="text-center mb-10">
+      <a href="/" class="no-underline inline-block">
+        <img
+          src="/static/img/cybercell_vit_updated_logo.PNG"
+          alt="VishwaCTF"
+          style="
+            height: 120px;
+            width: auto;
+            filter: drop-shadow(0 0 12px rgba(255, 31, 31, 0.5));
+          "
+        />
+      </a>
+      <h1 class="font-mono text-3xl font-bold text-white uppercase mb-2">
+        Verify Identity
+      </h1>
+      <p class="text-slate-400">
+        Enter the OTP sent to your email to complete registration.
+      </p>
+    </div>
+    {{if .Error}}
+    <div
+      class="mb-6 p-4 border-l-4 border-primary bg-primary/10 text-primary font-mono text-sm"
+    >
+      [!] {{.Error}}
+    </div>
+    {{end}}
+    <form method="POST" class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <label
+          class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+          >One-Time Password</label
+        >
+        <input
+          name="otp"
+          class="w-full bg-card-dark border border-primary-dark text-white px-4 py-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-700 font-mono text-center text-2xl tracking-widest"
+          placeholder="000000"
+          type="text"
+          maxlength="6"
+          required
+          autofocus
+        />
+      </div>
+      <button
+        type="submit"
+        class="flex w-full items-center justify-center bg-primary h-14 font-mono font-bold text-black hover:bg-red-700 transition-colors uppercase tracking-widest"
+        style="box-shadow: 0 0 20px rgba(255, 31, 31, 0.2)"
+      >
+        VERIFY &amp; ENTER
+      </button>
+    </form>
+    <div
+      class="mt-8 p-4 border border-primary/20 bg-primary/5 font-mono text-xs text-primary/60 text-center"
+    >
+      <p>// CHECK YOUR EMAIL FOR THE OTP</p>
+      <p>// CODE EXPIRES IN 10 MINUTES</p>
+    </div>
+    <p class="mt-6 text-center font-mono text-xs text-slate-600">
+      <a
+        href="/register"
+        class="text-slate-500 hover:text-primary transition-colors"
+        >← Back to registration</a
+      >
+    </p>
+  </div>
+</main>
+{{end}}

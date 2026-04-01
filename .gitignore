@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+backend/venv/
+
+# SQLite DB
+db.sqlite3
+backend/db.sqlite3
+
+# macOS
+.DS_Store
+
+# Django
+*.log
+media/
+staticfiles/
+
+# Go
+bin/

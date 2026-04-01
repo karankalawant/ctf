@@ -1,0 +1,80 @@
+{{define "content"}}
+{{template "nav" .}}
+<div class="pt-24 pb-20 px-6 max-w-5xl mx-auto min-h-screen">
+  <div class="mb-10">
+    <h1 class="font-mono text-5xl font-bold tracking-tighter text-white uppercase">Teams</h1>
+    <div class="w-16 h-0.5 bg-primary mt-3"></div>
+  </div>
+
+  {{if .Error}}<div class="mb-6 p-4 border-l-4 border-primary bg-primary/10 text-primary font-mono text-sm">[!] {{.Error}}</div>{{end}}
+
+  {{if .Data}}{{$d := .Data}}
+
+  <!-- My team info -->
+  {{if $d.my_team}}
+  <div class="bg-card-dark border border-primary p-6 mb-8" style="box-shadow:0 0 20px rgba(255,31,31,0.1)">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+      <div>
+        <div class="font-mono text-[10px] text-primary uppercase tracking-widest mb-2">Your Team</div>
+        <h2 class="font-mono text-2xl font-bold text-white uppercase">{{index $d.my_team "name"}}</h2>
+        <p class="text-slate-400 text-sm mt-2">{{index $d.my_team "description"}}</p>
+        <div class="mt-3 flex items-center gap-4">
+          <span class="font-mono text-xs text-slate-500">{{index $d.my_team "member_count"}} members</span>
+          <span class="font-mono text-xs text-primary font-bold">{{index $d.my_team "score"}} pts</span>
+          {{if index $d.my_team "invite_code"}}
+          <span class="font-mono text-xs text-slate-500">Invite: <span class="text-slate-300 font-bold">{{index $d.my_team "invite_code"}}</span></span>
+          {{end}}
+        </div>
+      </div>
+      <form method="POST" action="/teams/leave">
+        <button type="submit" class="border border-primary/30 text-primary hover:bg-primary hover:text-black font-mono text-xs px-6 py-2 uppercase tracking-wider transition-colors">Leave Team</button>
+      </form>
+    </div>
+  </div>
+  {{else if $.Username}}
+  <!-- Join or create team -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="bg-card-dark border border-primary-dark p-6 hover:border-primary transition-colors">
+      <h3 class="font-mono text-sm font-bold text-white uppercase mb-4">Create a Team</h3>
+      <p class="text-slate-400 text-sm mb-4">Start your own squad and invite others to join.</p>
+      <a href="/teams/create" class="bg-primary hover:bg-red-700 text-black font-mono font-bold text-xs px-6 py-3 uppercase tracking-wider no-underline inline-block transition-colors">Create Team</a>
+    </div>
+    <div class="bg-card-dark border border-primary-dark p-6 hover:border-primary transition-colors">
+      <h3 class="font-mono text-sm font-bold text-white uppercase mb-4">Join with Invite Code</h3>
+      <form method="POST" action="/teams/join" class="flex gap-3">
+        <input name="invite_code" placeholder="INVITE-CODE" class="flex-1 bg-bg-dark border border-primary-dark text-white px-4 py-2 font-mono text-sm focus:border-primary focus:ring-0 outline-none placeholder:text-slate-700 uppercase tracking-widest transition-colors"/>
+        <button type="submit" class="bg-primary hover:bg-red-700 text-black font-mono font-bold text-xs px-5 py-2 uppercase tracking-wider transition-colors">Join</button>
+      </form>
+    </div>
+  </div>
+  {{end}}
+
+  <!-- All teams -->
+  <div>
+    <h2 class="font-mono text-sm font-bold text-primary uppercase tracking-widest mb-6">All Teams</h2>
+    <div class="space-y-3">
+      {{range $d.teams}}
+      <div class="bg-card-dark border border-primary-dark p-5 hover:border-primary transition-colors flex items-center justify-between gap-4">
+        <div>
+          <h3 class="font-mono text-base font-bold text-white uppercase">{{index . "name"}}</h3>
+          <p class="text-slate-500 text-sm mt-1">{{index . "description"}}</p>
+        </div>
+        <div class="flex items-center gap-6 flex-shrink-0 text-right">
+          <div>
+            <div class="font-mono text-lg font-bold text-primary">{{index . "score"}}</div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider">Points</div>
+          </div>
+          <div>
+            <div class="font-mono text-lg font-bold text-slate-300">{{index . "member_count"}}</div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider">Members</div>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="text-center py-16 text-slate-500 font-mono text-sm">No teams yet. Be the first to create one!</div>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}

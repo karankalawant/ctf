@@ -1,0 +1,31 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<div style="background-color: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #417690;">
+    <h2 style="margin-top: 0; color: #417690;">Country Admin Time Statistics Summary</h2>
+    
+    {% if summary %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Countries:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ summary.total_countries }}</td>
+        </tr>
+        <tr style="background-color: #f9f9f9;">
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Users:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ summary.total_users }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Hours Spent:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong style="color: #d32f2f;">{{ summary.total_hours }} hrs</strong></td>
+        </tr>
+        <tr style="background-color: #f9f9f9;">
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Avg Hours per Country:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ summary.avg_hours_per_country }} hrs</td>
+        </tr>
+    </table>
+    {% else %}
+    <p>No statistics available yet.</p>
+    {% endif %}
+</div>
+
+{{ block.super }}

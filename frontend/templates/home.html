@@ -1,0 +1,442 @@
+{{define "content"}} {{template "nav" .}}
+<!-- Hero Section -->
+<section class="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden">
+  <div class="absolute inset-0" style="background-image:url('/static/img/cybercell_banner.jpg');background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+  <div class="absolute inset-0 bg-black/70"></div>
+  <div class="relative z-10 text-center px-4 max-w-5xl mx-auto">
+    <h2
+      class="font-mono text-white text-5xl md:text-7xl font-black leading-none mb-6 tracking-tight"
+    >
+      HACK. <span class="text-primary">CAPTURE.</span> DOMINATE.
+    </h2>
+    <p
+      class="text-slate-400 text-lg md:text-xl font-display mb-12 max-w-2xl mx-auto"
+    >
+      Join hackers in the ultimate cybersecurity showdown. Breach the perimeter
+      and secure the flag.
+    </p>
+    <div class="flex gap-4 justify-center mb-12" id="countdown-wrapper">
+      <div class="flex flex-col items-center gap-2">
+        <div
+          class="w-[72px] h-[72px] bg-card-dark border border-primary-dark flex items-center justify-center"
+        >
+          <span class="font-mono text-primary text-3xl font-bold" id="cd-days"
+            >--</span
+          >
+        </div>
+        <span
+          class="font-mono text-[10px] text-slate-500 uppercase tracking-widest"
+          >Days</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center gap-2 text-primary text-3xl font-bold pt-4"
+      >
+        :
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div
+          class="w-[72px] h-[72px] bg-card-dark border border-primary-dark flex items-center justify-center"
+        >
+          <span class="font-mono text-primary text-3xl font-bold" id="cd-hrs"
+            >--</span
+          >
+        </div>
+        <span
+          class="font-mono text-[10px] text-slate-500 uppercase tracking-widest"
+          >Hours</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center gap-2 text-primary text-3xl font-bold pt-4"
+      >
+        :
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div
+          class="w-[72px] h-[72px] bg-card-dark border border-primary-dark flex items-center justify-center"
+        >
+          <span class="font-mono text-primary text-3xl font-bold" id="cd-min"
+            >--</span
+          >
+        </div>
+        <span
+          class="font-mono text-[10px] text-slate-500 uppercase tracking-widest"
+          >Minutes</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center gap-2 text-primary text-3xl font-bold pt-4"
+      >
+        :
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div
+          class="w-[72px] h-[72px] bg-card-dark border border-primary-dark flex items-center justify-center"
+        >
+          <span class="font-mono text-primary text-3xl font-bold" id="cd-sec"
+            >--</span
+          >
+        </div>
+        <span
+          class="font-mono text-[10px] text-slate-500 uppercase tracking-widest"
+          >Seconds</span
+        >
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a
+        href="/register"
+        class="px-8 py-4 bg-primary text-white text-lg font-bold font-mono hover:bg-red-700 uppercase tracking-widest no-underline transition-colors"
+        >Register Now</a
+      >
+      <a
+        href="/challenges"
+        class="px-8 py-4 border border-primary text-primary hover:bg-primary/10 text-lg font-bold font-mono uppercase tracking-widest no-underline transition-colors"
+        >View Challenges</a
+      >
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<section
+  class="w-full bg-card-dark border-y border-primary-dark overflow-x-auto"
+>
+  <div class="max-w-7xl mx-auto flex divide-x divide-primary-dark">
+    <div class="flex-1 min-w-[160px] py-10 px-6 text-center">
+      <p class="font-mono text-primary text-3xl font-bold mb-1" id="s-pl">--</p>
+      <p class="font-mono text-slate-500 text-xs uppercase tracking-widest">
+        Players
+      </p>
+    </div>
+    <div class="flex-1 min-w-[160px] py-10 px-6 text-center">
+      <p class="font-mono text-primary text-3xl font-bold mb-1" id="s-ch">--</p>
+      <p class="font-mono text-slate-500 text-xs uppercase tracking-widest">
+        Challenges
+      </p>
+    </div>
+    <div class="flex-1 min-w-[160px] py-10 px-6 text-center">
+      <p class="font-mono text-primary text-3xl font-bold mb-1" id="s-tm">--</p>
+      <p class="font-mono text-slate-500 text-xs uppercase tracking-widest">
+        Teams
+      </p>
+    </div>
+    <div class="flex-1 min-w-[160px] py-10 px-6 text-center">
+      <p class="font-mono text-primary text-3xl font-bold mb-1" id="s-sv">--</p>
+      <p class="font-mono text-slate-500 text-xs uppercase tracking-widest">
+        Total Solves
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Categories + Top Players -->
+<section class="py-20 px-6 max-w-7xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+    <div>
+      <div class="mb-8">
+        <h2 class="font-mono text-white text-2xl font-bold uppercase mb-2">
+          Categories
+        </h2>
+        <div class="w-16 h-1 bg-primary"></div>
+      </div>
+      <div id="cats" class="space-y-2">
+        <div class="text-slate-500 font-mono text-sm">Loading...</div>
+      </div>
+    </div>
+    <div>
+      <div class="mb-8">
+        <h2 class="font-mono text-white text-2xl font-bold uppercase mb-2">
+          Top Players
+        </h2>
+        <div class="w-16 h-1 bg-primary"></div>
+      </div>
+      <div
+        class="w-full border border-primary-dark bg-card-dark overflow-hidden"
+      >
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-black border-b border-primary-dark">
+              <th
+                class="px-4 py-3 font-mono text-primary text-[10px] tracking-widest uppercase"
+              >
+                #
+              </th>
+              <th
+                class="px-4 py-3 font-mono text-primary text-[10px] tracking-widest uppercase"
+              >
+                Player
+              </th>
+              <th
+                class="px-4 py-3 font-mono text-primary text-[10px] tracking-widest uppercase text-right"
+              >
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody id="top-players"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-20 px-6 max-w-7xl mx-auto">
+  <div class="mb-12">
+    <h2 class="font-mono text-white text-3xl font-bold uppercase mb-2">
+      Built for the Elite
+    </h2>
+    <div class="w-24 h-1.5 bg-primary"></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div
+      class="bg-card-dark border border-primary-dark p-8 hover:border-primary transition-colors group"
+    >
+      <div class="mb-6">
+        <span class="material-symbols-outlined text-primary text-4xl"
+          >terminal</span
+        >
+      </div>
+      <h3
+        class="font-mono text-white text-xl font-bold uppercase mb-4 group-hover:text-primary transition-colors"
+      >
+        Real-World Challenges
+      </h3>
+      <p class="text-slate-400 leading-relaxed">
+        Pwn, web, reverse engineering, cryptography and forensics tasks designed
+        by security experts.
+      </p>
+    </div>
+    <div
+      class="bg-card-dark border border-primary-dark p-8 hover:border-primary transition-colors group"
+    >
+      <div class="mb-6">
+        <span class="material-symbols-outlined text-primary text-4xl"
+          >leaderboard</span
+        >
+      </div>
+      <h3
+        class="font-mono text-white text-xl font-bold uppercase mb-4 group-hover:text-primary transition-colors"
+      >
+        Live Leaderboard
+      </h3>
+      <p class="text-slate-400 leading-relaxed">
+        Track your progress and compete in real-time as ranks shift across the
+        globe.
+      </p>
+    </div>
+    <div
+      class="bg-card-dark border border-primary-dark p-8 hover:border-primary transition-colors group"
+    >
+      <div class="mb-6">
+        <span class="material-symbols-outlined text-primary text-4xl"
+          >group_work</span
+        >
+      </div>
+      <h3
+        class="font-mono text-white text-xl font-bold uppercase mb-4 group-hover:text-primary transition-colors"
+      >
+        Team Collaboration
+      </h3>
+      <p class="text-slate-400 leading-relaxed">
+        Form squads and coordinate your attack strategy together.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-card-dark border-t border-primary-dark pt-16 pb-8 px-6">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+    <div>
+      <div class="mb-6">
+  <a href="/" class="no-underline">
+    <img src="/static/img/vishwactf_transbg.png" alt="VishwaCTF" style="height:60px;width:auto;filter:drop-shadow(0 0 10px rgba(255,31,31,0.4));"/>
+  </a>
+</div>
+      <p class="text-slate-500 text-sm leading-relaxed">
+        The premier cybersecurity challenge platform for the next generation of
+        security researchers.
+      </p>
+    </div>
+    <div>
+      <h4 class="font-mono text-white text-sm font-bold uppercase mb-6">
+        Quick Links
+      </h4>
+      <ul class="space-y-3">
+        <li>
+          <a
+            href="/"
+            class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="/challenges"
+            class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors"
+            >Challenges</a
+          >
+        </li>
+        <li>
+          <a
+            href="/scoreboard"
+            class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors"
+            >Scoreboard</a
+          >
+        </li>
+        <li>
+          <a
+            href="/teams"
+            class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors"
+            >Teams</a
+          >
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-mono text-white text-sm font-bold uppercase mb-6">Social Media</h4>
+<ul class="space-y-3">
+  <li>
+    <a href="https://www.instagram.com/cybercell_vit" target="_blank" class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors">Instagram</a>
+  </li>
+  <li>
+    <a href="https://www.linkedin.com/company/cybercell-viit" target="_blank" class="text-slate-500 hover:text-primary text-sm font-mono uppercase no-underline transition-colors">LinkedIn</a>
+  </li>
+</ul>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-mono text-white text-sm font-bold uppercase mb-6">
+        Contact Us
+      </h4>
+      <div class="bg-primary/5 border border-primary-dark p-4">
+        <p class="text-primary font-mono text-xs font-bold mb-1">
+          Join Our Discord
+        </p>
+        <a
+          href="https://discord.gg/vishwactf"
+          class="text-slate-500 font-mono text-xs no-underline hover:underline"
+          >discord.gg/vishwactf</a
+        >
+      </div>
+    </div>
+  </div>
+  <div
+    class="max-w-7xl mx-auto border-t border-primary-dark/30 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
+  >
+    <p
+      class="font-mono text-primary-dark text-[10px] uppercase tracking-[0.2em]"
+    >
+      Built for hackers by hackers
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Fetch event date from API
+  let eventDate = null;
+
+  async function fetchEventDate() {
+    try {
+      const response = await fetch('/api/challenges/event/');
+      if (!response.ok) {
+        console.warn('Event API error, using fallback date');
+        // Fallback: 2 days 14 hours 45 minutes from now
+        eventDate = new Date(Date.now() + 2 * 24 * 3600 * 1000 + 14 * 3600 * 1000 + 45 * 60 * 1000);
+        startCountdown();
+        return;
+      }
+      const data = await response.json();
+      eventDate = new Date(data.end_date);
+      startCountdown();
+    } catch (error) {
+      console.error('Error fetching event:', error);
+      // Fallback: 2 days 14 hours 45 minutes from now
+      eventDate = new Date(Date.now() + 2 * 24 * 3600 * 1000 + 14 * 3600 * 1000 + 45 * 60 * 1000);
+      startCountdown();
+    }
+  }
+
+  function updateCountdown() {
+    const diff = eventDate - Date.now();
+    if (diff <= 0) {
+      document.getElementById("countdown-wrapper").innerHTML =
+        '<span class="font-mono text-primary text-2xl font-bold">EVENT LIVE!</span>';
+      return;
+    }
+    const d = Math.floor(diff / 86400000),
+      h = Math.floor((diff % 86400000) / 3600000),
+      m = Math.floor((diff % 3600000) / 60000),
+      s = Math.floor((diff % 60000) / 1000);
+    document.getElementById("cd-days").textContent = String(d).padStart(2, "0");
+    document.getElementById("cd-hrs").textContent = String(h).padStart(2, "0");
+    document.getElementById("cd-min").textContent = String(m).padStart(2, "0");
+    document.getElementById("cd-sec").textContent = String(s).padStart(2, "0");
+  }
+
+  function startCountdown() {
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+
+  // Fetch event date and start countdown
+  fetchEventDate();
+
+  async function load() {
+    try {
+      const [cr, sr, tr] = await Promise.all([
+        fetch("/api/challenges/categories/"),
+        fetch("/api/scoreboard/users/"),
+        fetch("/api/scoreboard/teams/"),
+      ]);
+      const cats = await cr.json(),
+        scores = await sr.json(),
+        teams = await tr.json();
+      document.getElementById("s-ch").textContent = cats.reduce(
+        (s, c) => s + (c.challenge_count || 0),
+        0,
+      );
+      document.getElementById("s-pl").textContent = scores.length;
+      document.getElementById("s-tm").textContent = teams.length;
+      document.getElementById("s-sv").textContent = scores.reduce(
+        (s, u) => s + (u.solved_count || 0),
+        0,
+      );
+      document.getElementById("cats").innerHTML =
+        cats
+          .map(
+            (c) => `
+      <a href="/challenges?category=${c.id}" class="flex items-center justify-between px-4 py-3 bg-card-dark border border-primary-dark hover:border-primary transition-colors no-underline group">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:${c.color};box-shadow:0 0 6px ${c.color}"></div>
+          <span class="font-mono text-sm text-white font-bold uppercase group-hover:text-primary transition-colors">${c.name}</span>
+        </div>
+        <span class="font-mono text-xs text-slate-500">${c.challenge_count || 0}</span>
+      </a>`,
+          )
+          .join("") ||
+        '<div class="text-slate-500 font-mono text-sm">No categories yet</div>';
+      const rankColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
+      document.getElementById("top-players").innerHTML =
+        scores
+          .slice(0, 8)
+          .map(
+            (u, i) => `
+      <tr class="border-b border-primary-dark/30 hover:bg-white/5 transition-colors">
+        <td class="px-4 py-3 font-mono text-sm font-bold" style="color:${rankColors[i] || "#6b7280"}">${i + 1}</td>
+        <td class="px-4 py-3"><a href="/users/${u.username}" class="text-primary font-mono text-sm font-bold no-underline hover:underline">${u.username}</a></td>
+        <td class="px-4 py-3 font-mono text-sm font-bold text-primary text-right">${u.score}</td>
+      </tr>`,
+          )
+          .join("") ||
+        '<tr><td colspan="3" class="px-4 py-6 text-center text-slate-500 font-mono text-sm">No scores yet</td></tr>';
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  load();
+</script>
+{{end}}

@@ -1,0 +1,313 @@
+{{define "content"}}
+<main class="flex min-h-screen w-full flex-row">
+  <!-- Left panel -->
+  <section
+    class="relative hidden w-1/2 flex-col items-center justify-center lg:flex border-r border-primary/20"
+    style="
+      background-image: url(&quot;/static/img/cybercell_vit_updated_logo.PNG&quot;);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: black;
+    "
+  >
+    <div class="absolute inset-0 bg-black/80"></div>
+    <div
+      class="absolute top-10 left-10 w-10 h-10 border-t-2 border-l-2 border-primary"
+    ></div>
+    <div
+      class="absolute bottom-10 right-10 w-10 h-10 border-b-2 border-r-2 border-primary"
+    ></div>
+    <div class="z-10 flex flex-col gap-8 max-w-md px-8">
+      <div class="flex flex-col gap-4">
+        <a href="/" class="no-underline">
+          <img
+            src="/static/img/vishwactf_transbg.png"
+            alt="VishwaCTF"
+            style="
+              height: 90px;
+              width: auto;
+              filter: drop-shadow(0 0 12px rgba(255, 31, 31, 0.5));
+            "
+          />
+        </a>
+        <p class="text-xl font-medium text-slate-300">
+          Join the arena. Prove your skill.
+        </p>
+      </div>
+      <div class="space-y-6 pt-6">
+        <div class="flex items-center gap-4">
+          <span
+            class="w-2 h-2 bg-primary rounded-full"
+            style="box-shadow: 0 0 8px rgba(255, 31, 31, 0.8)"
+          ></span>
+          <p class="text-lg font-mono text-slate-200 uppercase tracking-wider">
+            Hardcore Challenges
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          <span
+            class="w-2 h-2 bg-primary rounded-full"
+            style="box-shadow: 0 0 8px rgba(255, 31, 31, 0.8)"
+          ></span>
+          <p class="text-lg font-mono text-slate-200 uppercase tracking-wider">
+            Real-time Global Leaderboard
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          <span
+            class="w-2 h-2 bg-primary rounded-full"
+            style="box-shadow: 0 0 8px rgba(255, 31, 31, 0.9)"
+          ></span>
+          <p class="text-lg font-mono text-slate-200 uppercase tracking-wider">
+            Team Competition
+          </p>
+        </div>
+      </div>
+      <div
+        class="mt-8 p-4 border border-primary/20 bg-primary/5 font-mono text-xs text-primary"
+      >
+        <p>// CONNECTION SECURE</p>
+        <p>// PROTOCOL: RED_OVERRIDE_04</p>
+        <p>// STATUS: REGISTERING NEW OPERATIVE...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right panel - register form -->
+  <section
+    class="flex w-full flex-col items-center justify-center bg-card-dark px-8 lg:w-1/2 py-16"
+  >
+    <div class="w-full max-w-[440px] flex flex-col">
+      <nav class="mb-10 flex gap-8 border-b border-primary/10">
+        <a
+          href="/login"
+          class="font-mono text-sm font-bold tracking-[0.15em] pb-4 text-slate-500 hover:text-slate-300 transition-colors uppercase no-underline"
+          >LOGIN</a
+        >
+        <a
+          href="/register"
+          class="font-mono text-sm font-bold tracking-[0.15em] pb-4 text-primary border-b-2 border-primary uppercase no-underline"
+          >REGISTER</a
+        >
+      </nav>
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-white mb-2">Create your account.</h2>
+        <p class="text-slate-400">
+          Register as a new operative to join the arena.
+        </p>
+      </div>
+      {{if .Error}}
+      <div
+        class="mb-6 p-4 border-l-4 border-primary bg-primary/10 text-primary font-mono text-sm"
+      >
+        [!] {{.Error}}
+      </div>
+      {{end}}
+      <form method="POST" action="/register" class="flex flex-col gap-5">
+        <div class="flex flex-col gap-2">
+          <label
+            class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+            >Username</label
+          >
+          <input
+            name="username"
+            class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-700 font-mono"
+            placeholder="operator_01"
+            type="text"
+            autocomplete="username"
+            required
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label
+            class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+            >Email</label
+          >
+          <input
+            id="email-input"
+            name="email"
+            class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-700 font-mono"
+            placeholder="operator@redzone.io"
+            type="email"
+            autocomplete="email"
+            required
+            onblur="validateEmail(this)"
+          />
+          <p
+            id="email-error"
+            class="text-primary font-mono text-xs mt-1 hidden"
+          >
+            [!] Invalid email format
+          </p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label
+            class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+            >Country</label
+          >
+          <select
+            id="country-select"
+            name="country"
+            onchange="
+              this.classList.remove('text-slate-700');
+              this.classList.add('text-white');
+            "
+            class="w-full bg-bg-dark border border-primary-dark text-slate-700 px-4 py-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all font-mono appearance-none cursor-pointer"
+          >
+            <option value="">Loading countries...</option>
+          </select>
+        </div>
+
+        <script>
+          fetch("https://restcountries.com/v3.1/all?fields=name")
+            .then((r) => r.json())
+            .then((data) => {
+              const select = document.getElementById("country-select");
+              const countries = data
+                .map((c) => c.name.common)
+                .sort((a, b) => a.localeCompare(b));
+              select.innerHTML = '<option value="">Select Country</option>';
+              countries.forEach((name) => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                opt.textContent = name;
+                opt.className = "bg-card-dark";
+                select.appendChild(opt);
+              });
+            })
+            .catch(() => {
+              const select = document.getElementById("country-select");
+              select.innerHTML =
+                '<option value="">Failed to load — type your country</option>';
+              select.outerHTML = select.outerHTML.replace(
+                "select",
+                'input type="text" placeholder="Enter your country"',
+              );
+            });
+        </script>
+
+        <!-- Password field with toggle -->
+        <div class="flex flex-col gap-2">
+          <label
+            class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+            >Password</label
+          >
+          <div class="relative">
+            <input
+              id="reg-password"
+              name="password"
+              class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-4 pr-12 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-700 font-mono"
+              placeholder="••••••••••••"
+              type="password"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              onclick="togglePassword('reg-password', 'eye-reg1')"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-primary transition-colors"
+            >
+              <span id="eye-reg1" class="material-symbols-outlined text-xl"
+                >visibility_off</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirm Password field with toggle -->
+        <div class="flex flex-col gap-2">
+          <label
+            class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400"
+            >Confirm Password</label
+          >
+          <div class="relative">
+            <input
+              id="reg-confirm"
+              name="password_confirm"
+              class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-4 pr-12 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-700 font-mono"
+              placeholder="••••••••••••"
+              type="password"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              onclick="togglePassword('reg-confirm', 'eye-reg2')"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-primary transition-colors"
+            >
+              <span id="eye-reg2" class="material-symbols-outlined text-xl"
+                >visibility_off</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="mt-2 flex w-full items-center justify-center bg-primary h-14 font-mono font-bold text-black hover:bg-red-700 transition-colors uppercase tracking-widest"
+          style="box-shadow: 0 0 20px rgba(255, 31, 31, 0.2)"
+        >
+          ENLIST AS OPERATIVE
+        </button>
+      </form>
+      <footer class="mt-8 text-center">
+        <p class="font-mono text-xs text-slate-500 uppercase tracking-tighter">
+          Already have an account?
+          <a href="/login" class="text-primary hover:underline ml-2"
+            >Access terminal</a
+          >
+        </p>
+      </footer>
+    </div>
+  </section>
+  <script>
+    function validateEmail(input) {
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const error = document.getElementById("email-error");
+      if (!pattern.test(input.value) && input.value !== "") {
+        input.classList.remove("border-primary-dark");
+        input.classList.add("border-primary");
+        error.classList.remove("hidden");
+      } else {
+        input.classList.remove("border-primary");
+        input.classList.add("border-primary-dark");
+        error.classList.add("hidden");
+      }
+    }
+
+    document
+      .getElementById("email-input")
+      .addEventListener("focus", function () {
+        this.classList.remove("border-primary");
+        this.classList.add("border-primary-dark");
+        document.getElementById("email-error").classList.add("hidden");
+      });
+
+    document.querySelector("form").addEventListener("submit", function (e) {
+      const email = document.getElementById("email-input");
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!pattern.test(email.value)) {
+        e.preventDefault();
+        email.classList.add("border-primary");
+        document.getElementById("email-error").classList.remove("hidden");
+        email.focus();
+      }
+    });
+  </script>
+</main>
+
+<script>
+  function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.textContent = "visibility";
+    } else {
+      input.type = "password";
+      icon.textContent = "visibility_off";
+    }
+  }
+</script>
+{{end}}

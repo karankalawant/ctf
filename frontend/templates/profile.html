@@ -1,0 +1,136 @@
+{{define "content"}}
+{{template "nav" .}}
+<div class="flex h-screen flex-col overflow-hidden pt-16">
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Left profile panel -->
+    {{if .Data}}{{$u := .Data}}
+    <aside class="w-[300px] bg-card-dark border-r border-primary/30 flex flex-col overflow-y-auto flex-shrink-0">
+      <!-- Avatar section -->
+      <div class="p-8 border-b border-primary/20 text-center">
+        <div class="w-20 h-20 bg-primary/20 border-2 border-primary flex items-center justify-center font-mono font-bold text-3xl text-primary mx-auto mb-4">
+          {{slice (index $u "username") 0 1}}
+        </div>
+        <h2 class="font-mono text-xl font-bold text-white uppercase">{{index $u "username"}}</h2>
+        <p class="text-slate-500 font-mono text-xs mt-1">{{index $u "country"}}</p>
+        {{if index $u "is_staff"}}<span class="inline-block mt-2 px-3 py-1 border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 font-mono text-[10px] uppercase tracking-widest">Admin</span>{{end}}
+      </div>
+
+      <!-- Stats -->
+      <div class="p-6 border-b border-primary/20">
+        <div class="text-center mb-6">
+          <div class="font-mono text-4xl font-bold text-primary" style="text-shadow:0 0 20px rgba(255,31,31,0.4)">{{index $u "score"}}</div>
+          <div class="font-mono text-xs text-slate-500 uppercase tracking-widest mt-1">Total Points</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="text-center p-3 border border-primary-dark bg-primary/5">
+            <div class="font-mono text-2xl font-bold text-primary">{{index $u "solved_count"}}</div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider mt-1">Solved</div>
+          </div>
+          <div class="text-center p-3 border border-primary-dark bg-card-dark">
+            <div class="font-mono text-sm font-bold text-slate-300 mt-1">{{index $u "team_name"}}</div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider mt-1">Team</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account info -->
+      <div class="p-6">
+        <h3 class="font-mono text-[10px] font-bold text-primary uppercase tracking-widest mb-4">Account Info</h3>
+        <div class="space-y-3">
+          <div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider mb-1">Email</div>
+            <div class="font-mono text-xs text-slate-300 break-all">{{index $u "email"}}</div>
+          </div>
+          <div>
+            <div class="font-mono text-[10px] text-slate-500 uppercase tracking-wider mb-1">Member Since</div>
+            <div class="font-mono text-xs text-slate-300">{{index $u "created_at"}}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right content area -->
+    <main class="flex-1 overflow-y-auto p-8 bg-bg-dark">
+      <div class="max-w-2xl">
+        <div class="mb-8">
+          <h1 class="font-mono text-3xl font-bold text-white uppercase tracking-tight">Dashboard</h1>
+          <div class="w-16 h-0.5 bg-primary mt-2"></div>
+        </div>
+
+        {{if .Success}}<div class="mb-6 p-4 border-l-4 border-success bg-success/10 text-success font-mono text-sm font-bold">✓ {{.Success}}</div>{{end}}
+        {{if .Error}}<div class="mb-6 p-4 border-l-4 border-primary bg-primary/10 text-primary font-mono text-sm">[!] {{.Error}}</div>{{end}}
+
+        <!-- Edit Profile -->
+        <div class="bg-card-dark border border-primary-dark p-8 mb-6">
+          <h3 class="font-mono text-xs font-bold text-primary uppercase tracking-widest mb-6">Edit Profile</h3>
+          <form id="profile-form" class="space-y-5">
+            <div class="flex flex-col gap-2">
+              <label class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Bio</label>
+              <textarea name="bio" rows="3" placeholder="Tell us about yourself..." class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-3 focus:border-primary focus:ring-0 outline-none font-mono text-sm placeholder:text-slate-700 resize-none transition-colors">{{index $u "bio"}}</textarea>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Country</label>
+              <input type="text" name="country" value="{{index $u "country"}}" class="w-full bg-bg-dark border border-primary-dark text-white px-4 py-3 focus:border-primary focus:ring-0 outline-none font-mono text-sm placeholder:text-slate-700 transition-colors"/>
+            </div>
+            <div class="flex items-center gap-4">
+              <button type="submit" class="bg-primary hover:bg-red-700 text-black font-mono font-bold text-sm px-8 py-3 uppercase tracking-widest transition-colors">Save Changes</button>
+              <span id="save-msg" class="font-mono text-sm hidden"></span>
+            </div>
+          </form>
+        </div>
+
+        <!-- Team section -->
+        <div class="bg-card-dark border border-primary-dark p-8">
+          <h3 class="font-mono text-xs font-bold text-primary uppercase tracking-widest mb-6">Team</h3>
+          {{if index $u "team_name"}}
+          <p class="font-mono text-sm text-slate-300 mb-4">You are a member of <span class="text-primary font-bold">{{index $u "team_name"}}</span></p>
+          <div class="flex gap-4">
+            <a href="/teams" class="border border-primary-dark text-slate-400 hover:border-primary hover:text-white font-mono text-xs px-6 py-2 uppercase tracking-wider no-underline transition-colors">View Team</a>
+            <form method="POST" action="/teams/leave">
+              <button type="submit" class="border border-primary/30 text-primary hover:bg-primary hover:text-black font-mono text-xs px-6 py-2 uppercase tracking-wider transition-colors">Leave Team</button>
+            </form>
+          </div>
+          {{else}}
+          <p class="font-mono text-sm text-slate-500 mb-6">You are not in a team yet.</p>
+          <div class="flex gap-4">
+            <a href="/teams/create" class="bg-primary hover:bg-red-700 text-black font-mono font-bold text-xs px-6 py-3 uppercase tracking-wider no-underline transition-colors">Create Team</a>
+            <a href="/teams" class="border border-primary-dark text-slate-400 hover:border-primary hover:text-white font-mono text-xs px-6 py-3 uppercase tracking-wider no-underline transition-colors">Browse Teams</a>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </main>
+    {{end}}
+  </div>
+</div>
+
+<script>
+document.getElementById('profile-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(e.target));
+  const msg = document.getElementById('save-msg');
+  msg.classList.remove('hidden');
+  msg.className = 'font-mono text-sm text-slate-400';
+  msg.textContent = 'Saving...';
+  try {
+    const r = await fetch('/api/profile/update', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(d)
+    });
+    if(r.ok){
+      msg.className = 'font-mono text-sm text-success font-bold';
+      msg.textContent = '✓ Saved';
+    } else {
+      const err = await r.json();
+      msg.className = 'font-mono text-sm text-primary';
+      msg.textContent = '[!] ' + JSON.stringify(err);
+    }
+  } catch(err) {
+    msg.className = 'font-mono text-sm text-primary';
+    msg.textContent = '[!] Network error';
+  }
+  setTimeout(()=>msg.classList.add('hidden'), 3000);
+});
+</script>
+{{end}}

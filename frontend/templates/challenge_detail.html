@@ -1,0 +1,173 @@
+{{define "content"}}
+{{template "nav" .}}
+<div class="pt-24 pb-12 px-4 min-h-screen flex items-start justify-center" style="background-image:radial-gradient(circle at 2px 2px,#1a0a0a 1px,transparent 0);background-size:40px 40px;">
+  {{if .Data}}{{$c := .Data}}
+  <div class="w-full max-w-[700px]">
+    <!-- Back link -->
+    <a href="/challenges" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary font-mono text-xs uppercase tracking-wider mb-8 no-underline transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Challenges
+    </a>
+
+    <!-- Modal-style card -->
+    <div class="w-full bg-card-dark border border-primary" style="box-shadow:0 0 20px rgba(255,31,31,0.15)">
+      <!-- Header -->
+      <div class="p-8 border-b border-primary/20 flex flex-col gap-4">
+        <div class="flex justify-between items-start">
+          <div class="flex flex-col gap-1">
+            <h1 class="font-mono text-2xl font-bold uppercase tracking-tight text-white">{{index $c "title"}}</h1>
+            <div class="flex items-center gap-3 mt-1">
+              <span class="text-primary font-bold text-sm">{{index $c "current_points"}} PTS</span>
+              <span class="text-slate-500 text-sm">•</span>
+              <span class="text-slate-400 text-sm uppercase tracking-wider font-medium">{{index $c "solve_count"}} solves</span>
+              {{if index $c "author"}}<span class="text-slate-500 text-sm">•</span><span class="text-slate-400 text-sm">by <span class="text-primary">{{index $c "author"}}</span></span>{{end}}
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          {{if index $c "category"}}<div class="px-3 py-1 border border-primary/30 bg-primary/5"><span class="text-primary text-[10px] font-bold uppercase tracking-[0.2em]">{{index (index $c "category") "name"}}</span></div>{{end}}
+          {{$diff := index $c "difficulty"}}
+          {{if eq $diff "easy"}}<div class="px-3 py-1 border border-success/30 bg-success/5"><span class="text-success text-[10px] font-bold uppercase tracking-[0.2em]">EASY</span></div>
+          {{else if eq $diff "medium"}}<div class="px-3 py-1 border border-orange-500/30 bg-orange-500/5"><span class="text-orange-500 text-[10px] font-bold uppercase tracking-[0.2em]">MEDIUM</span></div>
+          {{else if eq $diff "hard"}}<div class="px-3 py-1 border border-primary/30 bg-primary/5"><span class="text-primary text-[10px] font-bold uppercase tracking-[0.2em]">HARD</span></div>
+          {{else}}<div class="px-3 py-1 border border-purple-500/30 bg-purple-500/5"><span class="text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em]">{{$diff}}</span></div>{{end}}
+        </div>
+        {{if index $c "is_solved"}}<div class="p-3 border border-success/30 bg-success/10 font-mono text-success text-sm font-bold uppercase tracking-widest text-center">✓ Challenge Solved!</div>{{end}}
+      </div>
+
+      <!-- Body -->
+      <div class="p-8 space-y-8 max-h-[500px] overflow-y-auto" style="::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#ff1f1f}">
+        {{if .Success}}<div class="p-4 border-l-4 border-success bg-success/10 text-success font-mono text-sm font-bold">✓ {{.Success}}</div>{{end}}
+        {{if .Error}}<div class="p-4 border-l-4 border-primary bg-primary/10 text-primary font-mono text-sm">[!] {{.Error}}</div>{{end}}
+
+        <!-- Description -->
+        <div class="space-y-4">
+          <p class="text-[15px] leading-relaxed text-slate-300">{{index $c "description"}}</p>
+          {{if index $c "url"}}
+          <a href="{{index $c "url"}}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 group no-underline">
+            <span class="material-symbols-outlined text-primary text-xl">link</span>
+            <span class="text-primary font-mono text-sm border-b border-primary/30 group-hover:border-primary transition-all">{{index $c "url"}}</span>
+          </a>
+          {{end}}
+        </div>
+
+        <!-- Files -->
+        {{if index $c "files"}}
+        <div class="space-y-3">
+          <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Challenge Files</h3>
+          {{range (index $c "files")}}
+          <a href="{{.}}" class="inline-flex items-center gap-2 group no-underline" download>
+            <span class="material-symbols-outlined text-primary text-xl">attach_file</span>
+            <span class="text-primary font-mono text-sm border-b border-primary/30 group-hover:border-primary transition-all">{{.}}</span>
+          </a>
+          {{end}}
+        </div>
+        {{end}}
+
+        <!-- Hints -->
+        {{if index $c "hints"}}
+        <div class="space-y-3">
+          <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">Intel &amp; Hints</h3>
+          {{range (index $c "hints")}}
+          <details class="group border border-primary/40 bg-primary/5">
+            <summary class="flex cursor-pointer items-center justify-between p-4 list-none">
+              <span class="text-xs font-bold tracking-widest text-white uppercase">
+                {{if gt (index . "cost") 0.0}}Hint ({{index . "cost"}} pts){{else}}Free Hint{{end}}
+              </span>
+              <span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <div class="px-4 pb-4 border-l-2 border-primary ml-4 mb-4">
+              {{if index . "is_unlocked"}}
+              <p class="text-sm text-slate-400 leading-relaxed font-mono">{{index . "text_masked"}}</p>
+              {{else}}
+              <button class="bg-transparent border border-primary text-primary px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-primary hover:text-black transition-all cursor-pointer" onclick="unlockHint({{index . "id"}},this)">Unlock Hint</button>
+              <div class="mt-3 text-sm text-slate-400 font-mono hidden" id="ht-{{index . "id"}}"></div>
+              {{end}}
+            </div>
+          </details>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+
+      <!-- Flag submission footer -->
+      {{if .Username}}
+      {{if not (index $c "is_solved")}}
+      <div class="p-8 border-t border-primary/20 bg-black">
+        <div class="flex flex-col gap-4">
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-primary/50 text-xl">terminal</span>
+            </div>
+            <input id="flag-input" class="w-full bg-bg-dark border border-primary/20 focus:border-primary focus:ring-0 text-white font-mono text-sm py-4 pl-12 pr-4 transition-all placeholder:text-slate-700 outline-none" placeholder="flag{...}" type="text"/>
+          </div>
+          <button onclick="submitFlag()" class="w-full bg-primary hover:bg-primary/90 text-black font-mono font-bold py-4 text-sm tracking-[0.2em] transition-all flex items-center justify-center gap-2 group uppercase">
+            SUBMIT FLAG
+            <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">bolt</span>
+          </button>
+          <div id="flag-result" class="hidden p-3 font-mono text-sm border-l-4 transition-all"></div>
+        </div>
+      </div>
+      {{end}}
+      {{else}}
+      <div class="p-8 border-t border-primary/20 bg-black text-center">
+        <a href="/login" class="text-primary hover:underline font-mono text-sm">Login</a>
+        <span class="text-slate-500 font-mono text-sm ml-2">to submit flags</span>
+      </div>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+</div>
+
+<script>
+const cid = {{if .Data}}{{index .Data "id"}}{{else}}0{{end}};
+async function submitFlag(){
+  const flag = document.getElementById('flag-input').value.trim();
+  if(!flag) return;
+  const res = document.getElementById('flag-result');
+  res.className = 'p-3 font-mono text-sm border-l-4 border-slate-500 text-slate-400';
+  res.textContent = 'Submitting...'; res.classList.remove('hidden');
+  try {
+    const r = await fetch('/api/submit/'+cid, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({flag})
+    });
+    let d;
+    const text = await r.text();
+    try { d = JSON.parse(text); }
+    catch(e) {
+      res.className = 'p-3 font-mono text-sm border-l-4 border-primary text-primary';
+      res.textContent = '[!] Server error: ' + r.status + ' — ' + text.slice(0,120);
+      return;
+    }
+    if(d.correct){
+      res.className = 'p-3 font-mono text-sm border-l-4 border-success text-success font-bold';
+      res.textContent = '✓ ' + d.message + (d.first_blood ? ' 🩸 FIRST BLOOD!' : '');
+      document.getElementById('flag-input').disabled = true;
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      res.className = 'p-3 font-mono text-sm border-l-4 border-primary text-primary';
+      res.textContent = '[!] ' + (d.message || d.error || 'Wrong flag');
+      document.getElementById('flag-input').select();
+    }
+  } catch(e){
+    res.className = 'p-3 font-mono text-sm border-l-4 border-primary text-primary';
+    res.textContent = '[!] Network error: ' + e.message;
+  }
+}
+document.getElementById('flag-input')?.addEventListener('keydown', e => { if(e.key==='Enter') submitFlag(); });
+async function unlockHint(id, btn){
+  if(!confirm('Unlock this hint?')) return;
+  try {
+    const r = await fetch('/api/hint/'+id, {method:'POST'});
+    const d = await r.json();
+    if(d.text){
+      btn.style.display='none';
+      const el = document.getElementById('ht-'+id);
+      if(el){ el.textContent = d.text; el.classList.remove('hidden'); }
+    } else { alert(d.error||'Could not unlock'); }
+  } catch(e){ alert('Error'); }
+}
+</script>
+{{end}}

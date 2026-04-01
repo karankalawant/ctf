@@ -1,0 +1,112 @@
+{{define "content"}}
+{{template "nav" .}}
+<div class="pt-24 pb-20 px-4 md:px-8 max-w-[1100px] mx-auto min-h-screen">
+  <header class="mb-10">
+    <h1 class="font-mono text-6xl font-extrabold text-white tracking-tighter">SCOREBOARD</h1>
+    <div class="flex items-center gap-4 mt-2">
+      <p class="text-slate-400 font-mono text-sm uppercase tracking-widest">Live rankings • <span class="text-primary">System Online</span></p>
+      <div class="h-[2px] w-20 bg-primary"></div>
+    </div>
+  </header>
+
+  <!-- Tab switcher -->
+  <div class="flex justify-start mb-10">
+    <div class="inline-flex p-1 bg-card-dark border border-primary-dark">
+      <button id="tab-ind-btn" onclick="showTab('ind')" class="px-10 py-2 bg-primary text-black font-mono font-black text-sm uppercase tracking-wider transition-all">INDIVIDUAL</button>
+      <button id="tab-teams-btn" onclick="showTab('teams')" class="px-10 py-2 text-slate-400 hover:text-white font-mono font-black text-sm uppercase tracking-wider transition-all">TEAMS</button>
+    </div>
+  </div>
+
+  <!-- Individual scoreboard -->
+  <div id="tab-ind" class="w-full border border-primary-dark bg-card-dark overflow-hidden mb-12" style="box-shadow:0 0 50px rgba(255,31,31,0.05)">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-black border-b border-primary-dark">
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Rank</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Player</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Country</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Team</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Solved</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase text-right">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{if .Data}}{{$d := .Data}}
+        {{range $d.users}}
+        {{$r := index . "rank"}}
+        <tr class="border-b border-primary-dark/30 hover:bg-white/5 transition-colors {{if eq (index . "username") $.Username}}bg-primary/5{{end}}">
+          <td class="px-6 py-4 font-mono font-bold text-sm">
+            {{if eq $r 1.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid #FFD700">1</span>
+            {{else if eq $r 2.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(192,192,192,.15);color:#C0C0C0;border:1px solid #C0C0C0">2</span>
+            {{else if eq $r 3.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(205,127,50,.15);color:#CD7F32;border:1px solid #CD7F32">3</span>
+            {{else}}<span class="text-slate-500">{{$r}}</span>{{end}}
+          </td>
+          <td class="px-6 py-4">
+            <a href="/users/{{index . "username"}}" class="text-primary font-mono font-bold text-sm no-underline hover:underline">
+              {{if eq (index . "username") $.Username}}★ {{end}}{{index . "username"}}
+            </a>
+          </td>
+          <td class="px-6 py-4 text-slate-400 font-mono text-sm">{{index . "country"}}</td>
+          <td class="px-6 py-4 text-slate-400 font-mono text-sm">{{index . "team"}}</td>
+          <td class="px-6 py-4 text-slate-400 font-mono text-sm">{{index . "solved_count"}}</td>
+          <td class="px-6 py-4 text-right">
+            <span class="text-primary font-mono font-bold">{{index . "score"}}</span>
+          </td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="px-6 py-16 text-center text-slate-500 font-mono text-sm">No scores yet. Be the first!</td></tr>
+        {{end}}{{end}}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Teams scoreboard -->
+  <div id="tab-teams" class="hidden w-full border border-primary-dark bg-card-dark overflow-hidden mb-12" style="box-shadow:0 0 50px rgba(255,31,31,0.05)">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-black border-b border-primary-dark">
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Rank</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Team</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase">Members</th>
+          <th class="px-6 py-4 font-mono text-primary text-xs tracking-widest uppercase text-right">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{if .Data}}{{$d := .Data}}
+        {{range $d.teams}}
+        {{$r := index . "rank"}}
+        <tr class="border-b border-primary-dark/30 hover:bg-white/5 transition-colors">
+          <td class="px-6 py-4 font-mono font-bold text-sm">
+            {{if eq $r 1.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid #FFD700">1</span>
+            {{else if eq $r 2.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(192,192,192,.15);color:#C0C0C0;border:1px solid #C0C0C0">2</span>
+            {{else if eq $r 3.0}}<span class="inline-flex items-center justify-center w-7 h-7 font-mono font-bold text-xs" style="background:rgba(205,127,50,.15);color:#CD7F32;border:1px solid #CD7F32">3</span>
+            {{else}}<span class="text-slate-500">{{$r}}</span>{{end}}
+          </td>
+          <td class="px-6 py-4 text-white font-mono font-bold text-sm">{{index . "team_name"}}</td>
+          <td class="px-6 py-4 text-slate-400 font-mono text-sm">{{index . "member_count"}}</td>
+          <td class="px-6 py-4 text-right"><span class="text-primary font-mono font-bold">{{index . "score"}}</span></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="4" class="px-6 py-16 text-center text-slate-500 font-mono text-sm">No teams yet</td></tr>
+        {{end}}{{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  const ind = document.getElementById('tab-ind'), teams = document.getElementById('tab-teams');
+  const indBtn = document.getElementById('tab-ind-btn'), teamsBtn = document.getElementById('tab-teams-btn');
+  if(name === 'ind'){
+    ind.classList.remove('hidden'); teams.classList.add('hidden');
+    indBtn.classList.add('bg-primary','text-black'); indBtn.classList.remove('text-slate-400');
+    teamsBtn.classList.remove('bg-primary','text-black'); teamsBtn.classList.add('text-slate-400');
+  } else {
+    teams.classList.remove('hidden'); ind.classList.add('hidden');
+    teamsBtn.classList.add('bg-primary','text-black'); teamsBtn.classList.remove('text-slate-400');
+    indBtn.classList.remove('bg-primary','text-black'); indBtn.classList.add('text-slate-400');
+  }
+}
+</script>
+{{end}}
