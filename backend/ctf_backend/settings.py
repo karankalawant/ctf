@@ -102,3 +102,17 @@ SIMPLE_JWT = {
 }
 CORS_ALLOW_CREDENTIALS = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Python 3.14 compatibility hack for Django 4.2
+# Python 3.14 made super() copyable, which breaks Django < 5.1 BaseContext.__copy__
+import sys
+if sys.version_info >= (3, 14):
+    from copy import copy
+    from django.template.context import BaseContext
+    def _basecontext_copy(self):
+        duplicate = BaseContext()
+        duplicate.__class__ = self.__class__
+        duplicate.__dict__ = copy(self.__dict__)
+        duplicate.dicts = self.dicts[:]
+        return duplicate
+    BaseContext.__copy__ = _basecontext_copy
