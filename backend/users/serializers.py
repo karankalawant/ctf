@@ -1,15 +1,40 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import CTFUser
+import re
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
     password_confirm = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = CTFUser
         fields = ['username', 'email', 'password', 'password_confirm', 'country']
+
+    def validate_username(self, value):
+        if not re.match(r'^[a-zA-Z0-9_]{3,30}$', value):
+            raise serializers.ValidationError(
+                "Username must be 3-30 characters, alphanumeric and underscores only."
+            )
+        return value
+
+    def validate_email(self, value):
+        if CTFUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value.lower()
+
+    def validate_password(self, value):
+        if not re.search(r'[A-Z]', value):
+            raise serializers.ValidationError("Password must contain at least one uppercase letter.")
+        if not re.search(r'[a-z]', value):
+            raise serializers.ValidationError("Password must contain at least one lowercase letter.")
+        if not re.search(r'[0-9]', value):
+            raise serializers.ValidationError("Password must contain at least one digit.")
+        if not re.search(r'[!@#$%^&*(),.?\":{}|<>]', value):
+            raise serializers.ValidationError("Password must contain at least one special character.")
+        return value
 
     def validate(self, data):
         if data['password'] != data['password_confirm']:
@@ -20,7 +45,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('password_confirm')
         return CTFUser.objects.create_user(
             username=validated_data['username'],
-            email=validated_data.get('email', ''),
+            email=validated_data['email'],
             password=validated_data['password'],
             country=validated_data.get('country', ''),
         )

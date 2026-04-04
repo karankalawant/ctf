@@ -3,21 +3,147 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import random
+import hashlib
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
+
 
 class EmailOTP(models.Model):
     user = models.ForeignKey('CTFUser', on_delete=models.CASCADE)
-    otp = models.CharField(max_length=6)
+    otp_hash = models.CharField(max_length=64)  # SHA-256 hash, NOT plaintext
     created_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
+    attempt_count = models.PositiveIntegerField(default=0)
 
     def is_expired(self):
         return timezone.now() > self.created_at + timedelta(minutes=5)
 
+    def is_locked(self):
+        max_attempts = getattr(settings, 'OTP_MAX_ATTEMPTS', 3)
+        return self.attempt_count >= max_attempts
+
+    def increment_attempts(self):
+        self.attempt_count += 1
+        self.save(update_fields=['attempt_count'])
+
+    def check_otp(self, raw_otp):
+        """Compare submitted OTP against stored hash."""
+        return self._hash_otp(raw_otp) == self.otp_hash
+
     @staticmethod
     def generate_otp():
         return str(random.randint(100000, 999999))
+
+    @staticmethod
+    def _hash_otp(raw_otp):
+        return hashlib.sha256(str(raw_otp).encode()).hexdigest()
+
+    @classmethod
+    def create_for_user(cls, user, raw_otp):
+        """Create an OTP record with the hashed OTP."""
+        return cls.objects.create(
+            user=user,
+            otp_hash=cls._hash_otp(raw_otp),
+        )
+
+
+class LoginAttempt(models.Model):
+    """Track login attempts for account lockout and security monitoring."""
+    username = models.CharField(max_length=150, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, default='')
+    successful = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['username', 'timestamp']),
+            models.Index(fields=['ip_address', 'timestamp']),
+        ]
+
+    def __str__(self):
+        status = '✓' if self.successful else '✗'
+        return f"{status} {self.username} from {self.ip_address} at {self.timestamp}"
+
+    @classmethod
+    def is_locked_out(cls, username):
+        """Check if username is locked out due to too many failed attempts."""
+        max_attempts = getattr(settings, 'ACCOUNT_LOCKOUT_ATTEMPTS', 5)
+        lockout_duration = getattr(settings, 'ACCOUNT_LOCKOUT_DURATION', timedelta(minutes=15))
+        cutoff = timezone.now() - lockout_duration
+
+        recent_failures = cls.objects.filter(
+            username=username,
+            successful=False,
+            timestamp__gte=cutoff,
+        ).count()
+
+        return recent_failures >= max_attempts
+
+    @classmethod
+    def record(cls, username, ip_address, user_agent='', successful=False):
+        return cls.objects.create(
+            username=username,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            successful=successful,
+        )
+
+
+class SecurityLog(models.Model):
+    """General security event log for monitoring and intrusion detection."""
+    EVENT_TYPES = [
+        ('LOGIN_FAIL', 'Failed Login'),
+        ('LOGIN_SUCCESS', 'Successful Login'),
+        ('LOCKOUT', 'Account Locked Out'),
+        ('OTP_FAIL', 'Failed OTP Verification'),
+        ('OTP_LOCKOUT', 'OTP Locked Out'),
+        ('OTP_SUCCESS', 'OTP Verified'),
+        ('REGISTER', 'Registration'),
+        ('HONEYPOT', 'Honeypot Triggered'),
+        ('RATE_LIMIT', 'Rate Limit Hit'),
+        ('SUSPICIOUS', 'Suspicious Activity'),
+        ('TOKEN_MISUSE', 'Token Misuse'),
+    ]
+
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    username = models.CharField(max_length=150, blank=True, default='')
+    user_agent = models.TextField(blank=True, default='')
+    details = models.TextField(blank=True, default='')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['event_type', 'timestamp']),
+            models.Index(fields=['ip_address', 'timestamp']),
+        ]
+
+    def __str__(self):
+        return f"[{self.event_type}] {self.username or 'anon'} from {self.ip_address} at {self.timestamp}"
+
+    @classmethod
+    def log(cls, event_type, ip_address=None, username='', user_agent='', details=''):
+        import logging
+        logger = logging.getLogger('security')
+
+        level = logging.WARNING if event_type in (
+            'LOGIN_FAIL', 'LOCKOUT', 'OTP_FAIL', 'OTP_LOCKOUT',
+            'HONEYPOT', 'RATE_LIMIT', 'SUSPICIOUS', 'TOKEN_MISUSE'
+        ) else logging.INFO
+
+        logger.log(level, f"{event_type} | user={username} ip={ip_address} | {details}")
+
+        return cls.objects.create(
+            event_type=event_type,
+            ip_address=ip_address,
+            username=username,
+            user_agent=user_agent,
+            details=details,
+        )
 
 class CTFUser(AbstractUser):
     bio = models.TextField(blank=True, default='')

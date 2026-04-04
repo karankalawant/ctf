@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
-	"text/template"
 )
 
 var apiURL string
@@ -82,45 +82,53 @@ func isAdmin(r *http.Request) bool {
 }
 
 func setAuthCookies(w http.ResponseWriter, access, refresh, username string, admin bool) {
-    maxAge := 86400 * 7
+	maxAge := 86400 * 7
 
-    http.SetCookie(w, &http.Cookie{
-        Name:     "ctf_access",
-        Value:    access,
-        Path:     "/",
-        MaxAge:   maxAge,
-        HttpOnly: true,
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:     "ctf_access",
+		Value:    access,
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 
-    http.SetCookie(w, &http.Cookie{
-        Name:     "ctf_refresh",
-        Value:    refresh,
-        Path:     "/",
-        MaxAge:   maxAge,
-        HttpOnly: true,
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:     "ctf_refresh",
+		Value:    refresh,
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 
-    http.SetCookie(w, &http.Cookie{
-        Name:   "ctf_username",
-        Value:  username,
-        Path:   "/",
-        MaxAge: maxAge,
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:     "ctf_username",
+		Value:    username,
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 
-    av := "0"
-    if admin {
-        av = "1"
-    }
+	av := "0"
+	if admin {
+		av = "1"
+	}
 
-    http.SetCookie(w, &http.Cookie{
-        Name:   "ctf_admin",
-        Value:  av,
-        Path:   "/",
-        MaxAge: maxAge,
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:     "ctf_admin",
+		Value:    av,
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 }
+
 func clearAuthCookies(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{Name: "ctf_access", Path: "/", MaxAge: -1})
+	http.SetCookie(w, &http.Cookie{Name: "ctf_refresh", Path: "/", MaxAge: -1})
 	http.SetCookie(w, &http.Cookie{Name: "ctf_username", Path: "/", MaxAge: -1})
 	http.SetCookie(w, &http.Cookie{Name: "ctf_admin", Path: "/", MaxAge: -1})
 }
@@ -145,7 +153,7 @@ func newPage(r *http.Request, title string) PageData {
 }
 
 var tmplFuncs = template.FuncMap{
-	"safeHTML": func(s string) string { return s },
+	"safeHTML": func(s string) template.HTML { return template.HTML(s) },
 	"add":      func(a, b int) int { return a + b },
 }
 

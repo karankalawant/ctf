@@ -3,7 +3,7 @@ from django.db.models import Count, Max, Min
 from django.utils.html import format_html
 from django.urls import path
 from django.template.response import TemplateResponse
-from .models import CTFUser, AdminTimeLog, CountryAdminStats
+from .models import CTFUser, AdminTimeLog, CountryAdminStats, LoginAttempt, SecurityLog
 
 
 @admin.register(CTFUser)
@@ -186,3 +186,31 @@ class CountryAdminStatsAdmin(admin.ModelAdmin):
         }
         
         return super().changelist_view(request, extra_context=extra_context)
+
+
+@admin.register(LoginAttempt)
+class LoginAttemptAdmin(admin.ModelAdmin):
+    list_display = ['username', 'ip_address', 'successful', 'timestamp']
+    list_filter = ['successful', 'timestamp']
+    search_fields = ['username', 'ip_address']
+    readonly_fields = ['username', 'ip_address', 'user_agent', 'successful', 'timestamp']
+    ordering = ['-timestamp']
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(SecurityLog)
+class SecurityLogAdmin(admin.ModelAdmin):
+    list_display = ['event_type', 'username', 'ip_address', 'short_details', 'timestamp']
+    list_filter = ['event_type', 'timestamp']
+    search_fields = ['username', 'ip_address', 'details']
+    readonly_fields = ['event_type', 'ip_address', 'username', 'user_agent', 'details', 'timestamp']
+    ordering = ['-timestamp']
+
+    def has_add_permission(self, request):
+        return False
+
+    def short_details(self, obj):
+        return obj.details[:80] + '...' if len(obj.details) > 80 else obj.details
+    short_details.short_description = 'Details'

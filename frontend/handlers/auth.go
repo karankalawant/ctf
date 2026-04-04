@@ -67,7 +67,25 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil || code != 201 {
-			pd.Error = "Registration failed"
+			// Parse the validation errors from Django DRF
+			var errMap map[string]interface{}
+			if err := json.Unmarshal(body, &errMap); err == nil && len(errMap) > 0 {
+				// Grab the first error message
+				for field, msgs := range errMap {
+					if msgList, ok := msgs.([]interface{}); ok && len(msgList) > 0 {
+						if strMsg, ok := msgList[0].(string); ok {
+							pd.Error = fmt.Sprintf("%s: %s", field, strMsg)
+							break
+						}
+					} else if strMsg, ok := msgs.(string); ok {
+						pd.Error = strMsg
+						break
+					}
+				}
+			}
+			if pd.Error == "" {
+				pd.Error = "Registration failed: Invalid input or user already exists"
+			}
 			renderTemplate(w, "register.html", pd)
 			return
 		}
